@@ -1,0 +1,9 @@
+[project]
+name = "hello-data-in-python"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "oracledb",
+    "pyarrow>=25.0.1",
+    "python-dotenv>=1.2.3",
+]
