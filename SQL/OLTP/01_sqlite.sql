@@ -1,0 +1,6 @@
+SELECT
+    *
+FROM
+    USERS_01
+LIMIT
+    10;
