@@ -19,7 +19,7 @@ def sqlite_uri(dbs: str) -> str:
 
 
 # ============================================================
-# postgresql_to_arrow:
+# sqlite_to_arrow:
 # params:
 # ============================================================
 def sqlite_to_arrow(database: str, query: str, output_file: str) -> Path:
