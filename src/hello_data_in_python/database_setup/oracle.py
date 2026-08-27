@@ -1,11 +1,14 @@
 from pathlib import Path
+
 import oracledb as odb
 import pyarrow as pa
+
 from hello_data_in_python.utils import get_my_table
+
 from .config import (
     ODB_DSN,
-    ODB_USER,
     ODB_PASSWORD,
+    ODB_USER,
 )
 
 
@@ -48,12 +51,11 @@ def oracledb_to_arrow(conn: odb.Connection, query: str, output_file: str) -> Pat
 def main() -> None:
     with get_conn(ODB_USER, ODB_PASSWORD, ODB_DSN) as conn:
         print("Hello from oracle.py!")
-        print(type(conn))
         sql = """SELECT 'Hello, World!' FROM dual"""
         path = oracledb_to_arrow(conn, sql, "hello_oracle")
         table = get_my_table(path)
         print(
-            f"***Arrow File Open***\nTABLE:\n{table.alias}\nSCHEMA:\n{table.table.schema}"
+            f"Arrow File {path} Open\nTABLE:\n{table.alias}\nSCHEMA:\n{table.table.schema}"
         )
 
 

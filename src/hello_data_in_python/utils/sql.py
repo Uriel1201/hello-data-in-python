@@ -1,13 +1,8 @@
-# /// script
-# requires-python = ">=3.12"
-# dependencies = [
-#     "pyarrow>=25.0.1",
-# ]
-# ///
 from dataclasses import dataclass
 from pathlib import Path
 
 import pyarrow as pa
+from adbc_driver_manager import dbapi
 
 
 @dataclass
@@ -39,3 +34,35 @@ def get_my_table(arrow_file: Path) -> MyArrowTable:
             table=pa.ipc.open_file(source).read_all(),
             alias=arrow_file.stem,
         )
+
+
+# ============================================================
+# dbapi_conn:
+# params:
+# ============================================================
+def dbapi_conn(uri: str, driver: str) -> dbapi.Connection:
+    return dbapi.connect(
+        driver=driver,
+        db_kwargs={"uri": uri},
+    )
+
+
+# ============================================================
+# dbapi_to_arrow:
+# params:
+# ============================================================
+def dbapi_to_arrow(conn: dbapi.Connection, query: str, output_file: str) -> Path:
+    try:
+        with conn.cursor() as cursor:
+            output_path = Path("data/arrow") / f"{output_file}.arrow"
+            batches = cursor.execute(query).fetch_record_batch()
+            with (
+                pa.OSFile(str(output_path), "wb") as my_file,
+                pa.ipc.new_file(my_file, batches.schema) as writer,
+            ):
+                for batch in batches:
+                    writer.write_batch(batch)
+            return output_path
+    except Exception as e:
+        print(f"DATABASE OPERATION FAILED: {e}")
+        raise
