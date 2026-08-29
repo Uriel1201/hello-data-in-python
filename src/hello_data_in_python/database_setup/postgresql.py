@@ -1,9 +1,16 @@
 from pathlib import Path
+import logging
 
 import pyarrow.dataset as ds
 from adbc_driver_manager import dbapi
 
-from hello_data_in_python.utils import dbapi_conn, dbapi_to_arrow, get_my_table
+logger = logging.getLogger(__name__)
+
+from hello_data_in_python.utils import (
+    dbapi_conn, 
+    dbapi_to_arrow, 
+    print_dbapi,
+)
 
 from .config import URI_POSTGRESQL
 
@@ -12,7 +19,7 @@ from .config import URI_POSTGRESQL
 # csv_path:
 # params:
 # ============================================================
-def csv_path(dbs: str) -> str:
+def csv_path(dbs: str) -> Path:
     try:
         path = Path("data/csv/") / dbs
         if not path.exists():
@@ -31,7 +38,9 @@ def csv_path(dbs: str) -> str:
 # ============================================================
 def postgresql_to_arrow(query: str, output_file: str) -> Path:
     with dbapi_conn(URI_POSTGRESQL, "postgresql") as conn:
-        return dbapi_to_arrow(conn, query, output_file)
+        path = dbapi_to_arrow(conn, query, output_file)
+        logger.info(f"Arrow File created -> {path}")
+        return path
 
 
 # ============================================================
@@ -52,30 +61,45 @@ def csv_to_postgresql(
                 )
                 first = False
             conn.commit()
+        logging.info(f"{path} ingested into {table_name}")
     except Exception as e:
         print(f"{e}")
         raise
 
 
+# ============================================================
+# print_postgresql:
+# params:
+# ============================================================
+def print_postgresql(conn: dbapi.Connection, query: str) -> None:
+    logger.info("Querying PostgreSQL")
+    print(print_dbapi(conn, query))
+
+
 def main() -> None:
-    print("Hello from postgresql.py!")
-    path = postgresql_to_arrow("""Select 'Hello, World!'""", "hellow-postgresql")
-    table = get_my_table(path)
-    print(
-        f"Arrow File {path} Open\nTABLE:\n{table.alias}\nSCHEMA:\n{table.table.schema}"
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(levelname)s:%(name)s:%(message)s",
     )
-    with dbapi_conn(URI_POSTGRESQL, "postgresql") as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("""
-                drop table if exists "hello"
-            """)
-            conn.commit()
+    print("Hello from postgresql.py!")
+    postgresql_to_arrow("""Select 'Hello, World!'""", "hellow-postgresql")
+
+    with (
+        dbapi_conn(URI_POSTGRESQL, "postgresql") as conn,
+        conn.cursor() as cursor,
+    ):
+        cursor.execute("""
+            drop table if exists "hello"
+        """)
+        conn.commit()
         path = csv_path("hello")
         csv_to_postgresql(conn, path, "hello", False)
-        result = conn.execute("""
+        print_postgresql(
+            conn,
+            """
             select * from "hello"
-        """)
-        print(f"{path} successfully loaded in your database")
+        """,
+        )
 
 
 if __name__ == "__main__":

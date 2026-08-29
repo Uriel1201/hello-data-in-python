@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
-
+import pandas as pd
 import pyarrow as pa
 from adbc_driver_manager import dbapi
 
@@ -9,18 +9,6 @@ from adbc_driver_manager import dbapi
 class MyArrowTable:
     table: pa.Table
     alias: str
-
-
-# ============================================================
-# get_schema:
-# params:
-# ============================================================
-def get_schema(filename: Path) -> pa.lib.Schema:
-    with (
-        pa.memory_map(str(filename), "rb") as source,
-        pa.ipc.open_file(source) as reader,
-    ):
-        return reader.schema
 
 
 # ============================================================
@@ -78,3 +66,14 @@ def dbapi_to_arrow(conn: dbapi.Connection, query: str, output_file: str) -> Path
     except Exception as e:
         print(f"DATABASE OPERATION FAILED: {e}")
         raise
+
+
+# ============================================================
+# print_dbapi:
+# params:
+# ============================================================
+def print_dbapi(conn: dbapi.Connection, query: str) -> pd.DataFrame:
+    with conn.cursor() as cursor:
+        data = cursor.execute(query).fetchmany(10)
+        columns = [column[0] for column in cursor.description]
+        return pd.DataFrame(data, columns = columns)
