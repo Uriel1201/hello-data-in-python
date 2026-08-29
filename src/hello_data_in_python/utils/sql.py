@@ -12,6 +12,18 @@ class MyArrowTable:
 
 
 # ============================================================
+# get_schema:
+# params:
+# ============================================================
+def get_schema(filename: Path) -> pa.lib.Schema:
+    with (
+        pa.memory_map(str(filename), "rb") as source,
+        pa.ipc.open_file(source) as reader,
+    ):
+        return reader.schema
+
+
+# ============================================================
 # get_query:
 # params:
 # ============================================================

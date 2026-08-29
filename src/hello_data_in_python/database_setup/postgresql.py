@@ -29,7 +29,7 @@ def csv_path(dbs: str) -> str:
 # postgresql_to_arrow:
 # params:
 # ============================================================
-def postgresql_to_arrow(query: Path, output_file: str) -> Path:
+def postgresql_to_arrow(query: str, output_file: str) -> Path:
     with dbapi_conn(URI_POSTGRESQL, "postgresql") as conn:
         return dbapi_to_arrow(conn, query, output_file)
 
