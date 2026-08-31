@@ -18,3 +18,15 @@ def get_my_table(arrow_file: Path) -> MyArrowTable:
             table=pa.ipc.open_file(source).read_all(),
             alias=arrow_file.stem,
         )
+
+# ============================================================
+# get_query:
+# params:
+# ============================================================
+def get_query(filename: str, alias: str) -> str:
+    try:
+        with open(filename, "r", encoding="utf-8") as file:
+            query = file.read()
+            return query.format(alias)
+    except FileNotFoundError:
+        raise FileNotFoundError(f"SQL file '{filename}' does not exist.")
