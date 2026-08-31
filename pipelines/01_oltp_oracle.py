@@ -15,7 +15,7 @@ def main(sql_file: str) -> None:
     logging.basicConfig(level=logging.INFO)
     print("Hello from 01_oltp_oracle.py!")
     with dbs.get_conn(ODB_USER, ODB_PASSWORD, ODB_DSN) as conn:
-        sql = get_query(f"SQL/OLTP/{sql_file}")
+        sql = get_query(f"oltp/{sql_file}")
         dbs.print_oracle(conn, sql)
 
 
