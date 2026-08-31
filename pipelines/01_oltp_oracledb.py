@@ -1,7 +1,7 @@
 import argparse
 import logging
 
-from utils.sql import get_query
+from utils.oltp import get_query
 
 from hello_data_in_python.database_setup import oracle as dbs
 from hello_data_in_python.database_setup.config import (
