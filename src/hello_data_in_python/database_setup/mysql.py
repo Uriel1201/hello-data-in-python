@@ -101,7 +101,6 @@ def print_mysql(conn: dbapi.Connection, query: str) -> None:
     print(print_dbapi(conn, query))
 
 
-
 def main() -> None:
     logging.basicConfig(
         level=logging.INFO,
