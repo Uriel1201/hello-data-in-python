@@ -3,6 +3,7 @@ import logging
 
 import oracledb as odb
 import pyarrow as pa
+import pandas as pd
 
 from .config import (
     ODB_DSN,
@@ -58,8 +59,8 @@ def print_oracle(conn: odb.Connection, query: str) -> None:
             rows = cursor.fetchmany(size=num_rows)
             if not rows:
                 break
-            for row in rows:
-                print(row)
+            columns = [column[0] for column in cursor.description]
+            print(pd.DataFrame(data, columns=columns))
 
 
 def main() -> None:
