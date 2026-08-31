@@ -60,7 +60,7 @@ def print_oracle(conn: odb.Connection, query: str) -> None:
             if not rows:
                 break
             columns = [column[0] for column in cursor.description]
-            print(pd.DataFrame(data, columns=columns))
+            print(pd.DataFrame(rows, columns=columns))
 
 
 def main() -> None:
