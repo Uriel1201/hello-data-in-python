@@ -6,7 +6,7 @@ from hello_data_in_python.database_setup.config import (
     ODB_PASSWORD,
     ODB_USER,
 )
-from utils import get_query
+from utils.sql import get_query
 
 logger = logging.getLogger(__name__)
 
