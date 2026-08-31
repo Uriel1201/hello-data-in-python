@@ -4,8 +4,6 @@ import logging
 import oracledb as odb
 import pyarrow as pa
 
-from hello_data_in_python.utils import get_my_table
-
 from .config import (
     ODB_DSN,
     ODB_PASSWORD,
