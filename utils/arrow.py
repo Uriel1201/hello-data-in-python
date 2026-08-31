@@ -1,3 +1,7 @@
+from dataclasses import dataclass
+from pathlib import Path
+import pyarrow as pa
+
 @dataclass
 class MyArrowTable:
     table: pa.Table
@@ -27,4 +31,3 @@ def get_my_table(arrow_file: Path) -> MyArrowTable:
             table=pa.ipc.open_file(source).read_all(),
             alias=arrow_file.stem,
         )
-
