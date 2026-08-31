@@ -10,7 +10,7 @@ from hello_data_in_python.utils import get_query
 
 def main(sql_file: str) -> None:
     with dbs.get_conn(ODB_USER, ODB_PASSWORD, ODB_DSN) as conn:
-        sql = get_query(f"SQL/OLTP/{sql_file}")
+        sql = get_query(f"oltp/{sql_file}")
         dbs.oracledb_to_arrow(conn, sql, "01_oracle")
 
 if __name__ == "__main__":
