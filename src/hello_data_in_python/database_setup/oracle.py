@@ -54,13 +54,13 @@ def print_oracle(conn: odb.Connection, query: str) -> None:
     logger.info(f"Querying Oracle")
     with conn.cursor() as cursor:
         cursor.execute(query)
+        columns = [column[0] for column in cursor.description]
         num_rows = 20
         while True:
             rows = cursor.fetchmany(size=num_rows)
             if not rows:
                 break
-            columns = [column[0] for column in cursor.description]
-            print(pd.DataFrame(rows, columns=columns))
+        print(pd.DataFrame(rows, columns=columns))
 
 
 def main() -> None:
