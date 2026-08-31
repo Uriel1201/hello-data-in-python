@@ -5,7 +5,7 @@ from hello_data_in_python.database_setup.config import (
     ODB_PASSWORD,
     ODB_USER,
 )
-from utils.arrow import get_query
+from utils import get_query
 
 
 def main(sql_file: str) -> None:
