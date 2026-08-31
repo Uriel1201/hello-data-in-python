@@ -55,12 +55,14 @@ def print_oracle(conn: odb.Connection, query: str) -> None:
     with conn.cursor() as cursor:
         cursor.execute(query)
         columns = [column[0] for column in cursor.description]
-        num_rows = 20
-        while True:
-            rows = cursor.fetchmany(size=num_rows)
+        num_rows = 5
+        total = 0
+        while total < 20:
+            rows = cursor.fetchmany(size = 5)
             if not rows:
                 break
-        print(pd.DataFrame(rows, columns=columns))
+            total += len(rows)
+            print(pd.DataFrame(rows, columns=columns))
 
 
 def main() -> None:
