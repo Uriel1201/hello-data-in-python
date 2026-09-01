@@ -1,11 +1,18 @@
+import logging
 from dataclasses import dataclass
 from pathlib import Path
+
+import duckdb as duck
 import pyarrow as pa
+
+logger = logging.getLogger(__name__)
+
 
 @dataclass
 class MyArrowTable:
     table: pa.Table
     alias: str
+
 
 # ============================================================
 # get_my_table:
@@ -13,20 +20,27 @@ class MyArrowTable:
 # ============================================================
 def get_my_table(arrow_file: Path) -> MyArrowTable:
     path_ = str(arrow_file)
-    with pa.memory_map(path_, "rb") as source:
-        return MyArrowTable(
-            table=pa.ipc.open_file(source).read_all(),
-            alias=arrow_file.stem,
-        )
+    if arrow_file.exists():
+        with pa.memory_map(path_, "rb") as source:
+            logger.info(f"{arrow_file} read")
+            return MyArrowTable(
+                table=pa.ipc.open_file(source).read_all(),
+                alias=arrow_file.stem,
+            )
+    else:
+        raise FileNotFoundError(f"Path {arrow_file} does not exist")
+
 
 # ============================================================
-# get_query:
+# print_duck:
 # params:
 # ============================================================
-def get_query(filename: str, alias: str) -> str:
+def print_duck(table: MyArrowTable, sql: Path) -> None:
     try:
-        with open(filename, "r", encoding="utf-8") as file:
-            query = file.read()
-            return query.format(alias)
+        with open(sql, "r", encoding="utf-8") as file:
+            logger.info(f"Querying table {table.alias}")
+            query = file.read().format(table.alias)
+            duck.register(table.alias, table.table)
+            duck.sql(query).show()
     except FileNotFoundError:
-        raise FileNotFoundError(f"SQL file '{filename}' does not exist.")
+        raise FileNotFoundError(f"SQL file '{sql}' does not exist.")

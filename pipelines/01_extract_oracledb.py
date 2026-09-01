@@ -11,14 +11,15 @@ from utils.oltp import get_query
 logger = logging.getLogger(__name__)
 
 
-def main(sql_file: str) -> None:
+def main(sql_file: str, output_file: str) -> None:
     logging.basicConfig(level=logging.INFO)
     with dbs.get_conn(ODB_USER, ODB_PASSWORD, ODB_DSN) as conn:
         sql = get_query(f"oltp/{sql_file}")
-        dbs.oracledb_to_arrow(conn, sql, "01_oracle")
+        dbs.oracledb_to_arrow(conn, sql, output_file)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("sql_file")
+    parser.add_argument("output_file")
     args = parser.parse_args()
-    main(args.sql_file)
+    main(args.sql_file, args.output_file)

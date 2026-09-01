@@ -6,33 +6,26 @@
 # ]
 # ///
 import argparse
+import logging
 from pathlib import Path
+
 from utils import olap
-import duckdb as duck
+
+logger = logging.getLogger(__name__)
 
 
-# ============================================================
-# print_duck_query:
-# params:
-# ============================================================
-def print_duck(table: olap.MyArrowTable, query: str) -> None:
-
-    duck.register(table.alias, table.table)
-    duck.sql(query).show()
-
-
-def main(sql_file: str) -> None:
+def main(arrow_file: str, sql: str) -> None:
+    logging.basicConfig(level=logging.INFO)
     print("Hello from 01_olap_arrow.py!")
-    path = Path("data/arrow/01_oracle.arrow")
+    path = Path("data/arrow") / arrow_file
     my_table = olap.get_my_table(path)
-    query = olap.get_query(f"olap/{sql_file}", "01_oracle")
-    print(query)
-    print_duck(my_table, query)
-    
-    
+    sql = Path("olap") / sql
+    olap.print_duck(my_table, sql)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("sql_file")
+    parser.add_argument("arrow_file")
+    parser.add_argument("sql")
     args = parser.parse_args()
-    main(args.sql_file)
+    main(args.arrow_file, args.sql)
