@@ -1,0 +1,6 @@
+SELECT 
+    USER_ID,
+    ACTION,
+    DATES::DATE AS DATES
+FROM
+    '{}'
