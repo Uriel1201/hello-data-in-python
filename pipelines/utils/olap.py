@@ -24,8 +24,8 @@ def get_my_table(arrow_file: Path) -> MyArrowTable:
         with pa.memory_map(path_, "rb") as source:
             logger.info(f"{arrow_file} read")
             return MyArrowTable(
-                table=pa.ipc.open_file(source).read_all(),
-                alias=arrow_file.stem,
+                table = pa.ipc.open_file(source).read_all(),
+                alias = arrow_file.stem,
             )
     else:
         raise FileNotFoundError(f"Path {arrow_file} does not exist")
@@ -41,6 +41,6 @@ def print_duck(table: MyArrowTable, sql: Path) -> None:
             logger.info(f"Querying table {table.alias}")
             query = file.read().format(table.alias)
             duck.register(table.alias, table.table)
-            duck.sql(query).show()
+            duck.sql(query).df()
     except FileNotFoundError:
         raise FileNotFoundError(f"SQL file '{sql}' does not exist.")
