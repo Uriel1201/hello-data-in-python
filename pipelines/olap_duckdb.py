@@ -20,7 +20,7 @@ def main(arrow_file: str, sql: str) -> None:
     path = Path("data/arrow") / arrow_file
     my_table = olap.get_my_table(path)
     sql = Path("olap") / sql
-    olap.print_duck(my_table, sql)
+    print(olap.my_duck_table(my_table, sql))
 
 
 if __name__ == "__main__":

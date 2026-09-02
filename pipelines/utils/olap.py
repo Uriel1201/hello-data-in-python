@@ -35,12 +35,12 @@ def get_my_table(arrow_file: Path) -> MyArrowTable:
 # print_duck:
 # params:
 # ============================================================
-def print_duck(table: MyArrowTable, sql: Path) -> None:
+def my_duck_table(table: MyArrowTable, sql: Path) -> pa.Table:
     try:
         with open(sql, "r", encoding="utf-8") as file:
             logger.info(f"Querying table {table.alias}")
             query = file.read().format(table.alias)
             duck.register(table.alias, table.table)
-            duck.sql(query).df()
+            return duck.sql(query).to_arrow_table()
     except FileNotFoundError:
         raise FileNotFoundError(f"SQL file '{sql}' does not exist.")
