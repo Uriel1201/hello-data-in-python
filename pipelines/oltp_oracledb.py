@@ -1,14 +1,13 @@
 import argparse
 import logging
 
-from utils.oltp import get_query
-
 from hello_data_in_python.database_setup import oracle as dbs
 from hello_data_in_python.database_setup.config import (
     ODB_DSN,
     ODB_PASSWORD,
     ODB_USER,
 )
+from hello_data_in_python.utils import get_query
 
 logger = logging.getLogger(__name__)
 
