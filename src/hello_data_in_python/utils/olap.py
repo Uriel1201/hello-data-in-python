@@ -22,7 +22,7 @@ def get_my_table(arrow_file: Path) -> MyArrowTable:
     path_ = str(arrow_file)
     if arrow_file.exists():
         with pa.memory_map(path_, "rb") as source:
-            logger.info(f"{arrow_file} read")
+            logger.info(f"IPC file:{arrow_file} read")
             return MyArrowTable(
                 table = pa.ipc.open_file(source).read_all(),
                 alias = arrow_file.stem,
