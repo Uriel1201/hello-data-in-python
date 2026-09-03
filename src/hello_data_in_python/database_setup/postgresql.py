@@ -51,16 +51,15 @@ def postgresql_to_arrow(query: str, output_file: str) -> Path:
 # params:
 # ============================================================
 def csv_to_postgresql(
-    conn: dbapi.Connection, path: Path, table_name: str, schema: pa.Schema, exists: bool
+    conn: dbapi.Connection, path: Path, table_name: str, exists: bool
 ) -> None:
-    dataset = ds.dataset(path, format="csv", schema = schema)
+    dataset = ds.dataset(path, format="csv")
     logging.info(f"Schema:\n{dataset.schema}")
     reader = dataset.scanner().to_reader()
     try:
         with conn.cursor() as cursor:
             first = not exists
             for batch in reader:
-                print(batch.schema)
                 cursor.adbc_ingest(
                     table_name, batch, mode="create" if first else "append"
                 )
