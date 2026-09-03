@@ -1,6 +1,6 @@
 select 
   "USER_ID", 
   "ACTION", 
-  "DATES"::date as "DATES"
+  ("DATES"::timestamptz)::date as "DATES"
 from 
   "USERS_01"
