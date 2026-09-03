@@ -48,7 +48,7 @@ def postgresql_to_arrow(query: str, output_file: str) -> Path:
 # params:
 # ============================================================
 def csv_to_postgresql(
-    conn: dbapi.Connection, path: str, table_name: str, exists: bool
+    conn: dbapi.Connection, path: Path, table_name: str, exists: bool
 ) -> None:
     dataset = ds.dataset(path, format="csv")
     reader = dataset.scanner().to_reader()
