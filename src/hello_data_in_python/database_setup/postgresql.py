@@ -2,13 +2,14 @@ from pathlib import Path
 import logging
 
 import pyarrow.dataset as ds
+import pyarrow as pa
 from adbc_driver_manager import dbapi
 
 logger = logging.getLogger(__name__)
 
 from hello_data_in_python.utils import (
-    dbapi_conn, 
-    dbapi_to_arrow, 
+    dbapi_conn,
+    dbapi_to_arrow,
     print_dbapi,
 )
 
@@ -21,9 +22,11 @@ from .config import URI_POSTGRESQL
 # ============================================================
 def csv_path(dbs: str) -> Path:
     try:
-        path = Path("data/csv/") / dbs
+        path = Path("data/csv") / dbs
         if not path.exists():
-            path = Path("data/csv")
+            path = Path("data") / dbs
+        if not path.exists():
+            path = Path(dbs)
         if not path.exists():
             raise FileNotFoundError(f"folder not found: {path}")
         return path
@@ -48,20 +51,22 @@ def postgresql_to_arrow(query: str, output_file: str) -> Path:
 # params:
 # ============================================================
 def csv_to_postgresql(
-    conn: dbapi.Connection, path: Path, table_name: str, exists: bool
+    conn: dbapi.Connection, path: Path, table_name: str, schema: pa.Schema, exists: bool
 ) -> None:
-    dataset = ds.dataset(path, format="csv")
+    dataset = ds.dataset(path, format="csv", schema = schema)
+    logging.info(f"Schema:\n{dataset.schema}")
     reader = dataset.scanner().to_reader()
     try:
         with conn.cursor() as cursor:
             first = not exists
             for batch in reader:
+                print(batch.schema)
                 cursor.adbc_ingest(
                     table_name, batch, mode="create" if first else "append"
                 )
                 first = False
             conn.commit()
-        logging.info(f"{path} ingested into {table_name}")
+        logging.info(f"{path} ingested")
     except Exception as e:
         print(f"{e}")
         raise
