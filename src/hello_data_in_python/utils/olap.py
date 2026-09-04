@@ -39,7 +39,7 @@ def my_duck_table(table: MyArrowTable, sql: Path) -> pa.Table:
     try:
         with open(sql, "r", encoding="utf-8") as file:
             logger.info(f"Querying table {table.alias}")
-            query = file.read().format(table.alias)
+            query = file.read().format(table = table.alias)
             duck.register(table.alias, table.table)
             return duck.sql(query).to_arrow_table()
     except FileNotFoundError:

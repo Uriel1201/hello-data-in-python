@@ -1,1 +1,1 @@
-DESC '{}'
+DESC '{table}'
