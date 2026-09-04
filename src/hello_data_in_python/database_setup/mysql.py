@@ -1,5 +1,5 @@
+import logging
 from pathlib import Path
-import logging 
 
 import pyarrow as pa
 from adbc_driver_manager import dbapi
@@ -22,9 +22,13 @@ from .config import URI_MYSQL
 def get_schema(arrow_schema: pa.lib.Schema, table_name: str) -> str:
     sql_fields = []
     for field in arrow_schema:
-        var_type = field.metadata[b"sql.database_type_name"].decode("utf-8")
-        if var_type == "VARCHAR":
-            sql_fields.append(f"`{field.name}` {var_type}(15)")
+        type = field.type
+        if pa.types.is_float64(type):
+            sql_fields.append(f"`{field.name}` DOUBLE")
+        if pa.types.is_large_string(type):
+            sql_fields.append(f"`{field.name}` TEXT")
+        if pa.types.is_timestamp(type):
+            sql_fields.append(f"`{field.name}` DATETIME")
     return (
         f"CREATE TABLE IF NOT EXISTS `{table_name}` (\n"
         + "`EVENT_ID` BIGINT NOT NULL PRIMARY KEY,\n"
@@ -41,11 +45,11 @@ def create_table(
     conn: dbapi.Connection, arrow_schema: pa.lib.Schema, table_name: str
 ) -> None:
     schema = get_schema(arrow_schema, table_name)
+    logger.info(f"schema:\n{schema}")
     with conn.cursor() as cursor:
-        cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
         cursor.execute(schema)
         conn.commit()
-    logger.info(f"MySQL table created -> {table_name}")
+    logger.info("MySQL table crated")
 
 
 # ============================================================
@@ -55,7 +59,7 @@ def create_table(
 def mysql_to_arrow(query: str, output_file: str) -> Path:
     with dbapi_conn(URI_MYSQL, "mysql") as conn:
         path = dbapi_to_arrow(conn, query, output_file)
-        logger.info(f"Arrow File created -> {path}")
+        logger.info(f"Arrow File created: {path}")
         return path
 
 
@@ -70,7 +74,7 @@ def arrow_to_mysql(
     try:
         with conn.cursor() as cursor:
             cursor.execute(f"""
-                    SELECT 
+                    SELECT
                         COALESCE (MAX(EVENT_ID),0)
                     FROM
                         `{table_name}`
@@ -87,10 +91,11 @@ def arrow_to_mysql(
                 batch = batch.add_column(0, "EVENT_ID", ids)
                 cursor.adbc_ingest(table_name, batch, mode="append")
                 conn.commit()
-        logger.info(f"{num_of} RecordBatches ingested into {table_name}")
+        logger.info(f"{num_of} RecordBatches ingested")
     except Exception as e:
         print(f"{e}")
         raise
+
 
 # ============================================================
 # print_mysql:
@@ -117,6 +122,7 @@ def main() -> None:
         create_table(conn, reader.schema, "HELLO")
         arrow_to_mysql(conn, reader, "HELLO")
         print_mysql(conn, "SELECT * FROM `HELLO`")
+
 
 if __name__ == "__main__":
     main()
