@@ -5,7 +5,7 @@ WITH TOTALS AS (
         SUM(IF(ACTION = 'cancel', 1, 0)) AS TOTAL_CANCELS,
         SUM(IF(ACTION = 'publish', 1, 0)) AS TOTAL_PUBLISHES
     FROM 
-        '{}'
+        '{table}'
     GROUP BY
         USER_ID
 )
