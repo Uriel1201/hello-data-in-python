@@ -44,7 +44,7 @@ def oracledb_to_arrow(conn: odb.Connection, query: str, output_file: str) -> Pat
                     df.column_arrays(), names=df.column_names()
                 )
                 writer.write_batch(batches)
-        logger.info(f"Arrow File created -> {output_path}")
+        logger.info(f"{output_path} created")
         return output_path
     except Exception as e:
         print(f"DATABASE OPERATION FAILED: {e}")
