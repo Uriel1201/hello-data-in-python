@@ -1,5 +1,5 @@
+FROM
+    '{table}'
 SELECT
     AMOUNT,
     TRANSACTION_DATE::DATE AS TRANSACTION_DATES
-FROM
-    '{table}'
