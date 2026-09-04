@@ -1,9 +1,9 @@
 import argparse
 import logging
-import pyarrow as pa
 from hello_data_in_python.database_setup import postgresql as dbs
 from hello_data_in_python.database_setup.config import URI_POSTGRESQL
 from hello_data_in_python.utils import dbapi_conn
+import utils
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +20,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("csv_path")
     parser.add_argument("postgres")
-    parser.add_argument("exists", type = str_to_bool)
+    parser.add_argument("exists", type = utils.str_to_bool)
     args = parser.parse_args()
     main(args.csv_path, args.postgres, args.exists)
