@@ -1,14 +1,22 @@
+/*
+02. Changes in Net Worth
+
+From the following table of transactions
+between two users, write a query to
+return the change in net worth for each
+user, ordered by decreasing net change. */
+
 /* ORACLE. */
 
 /********************************************************************/
-CREATE TABLE TRANSACTIONS_P2 (
+CREATE TABLE TRANSACTIONS_02 (
     SENDER           INTEGER,
     RECEIVER         INTEGER,
     AMOUNT           DECIMAL,
     TRANSACTION_DATE DATE
 );
 
-INSERT INTO TRANSACTIONS_P2
+INSERT INTO TRANSACTIONS_02
     WITH NAMES AS (
         SELECT
             5,
