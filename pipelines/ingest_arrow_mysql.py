@@ -11,7 +11,7 @@ from hello_data_in_python.utils import dbapi_conn
 logger = logging.getLogger(__name__)
 
 
-def main(file: str) -> None:
+def main(file: str, table_name: str) -> None:
     logging.basicConfig(level=logging.INFO)
     print("Hello from ingest_arrow_mysql.py!")
     path = Path("data/arrow") / file
@@ -21,8 +21,8 @@ def main(file: str) -> None:
             pa.memory_map(str(path), "rb") as source,
             pa.ipc.open_file(source) as reader,
         ):
-            dbs.create_table(conn, reader.schema, "USERS_01")
-            dbs.arrow_to_mysql(conn, reader, "USERS_01")
+            dbs.create_table(conn, reader.schema, table_name)
+            dbs.arrow_to_mysql(conn, reader, table_name)
 
     else:
         raise FileNotFoundError(f"Path {path} does not exist")
@@ -31,5 +31,6 @@ def main(file: str) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("file")
+    parser.add_argument("table_name")
     args = parser.parse_args()
-    main(args.file)
+    main(args.file, args.table_name)
