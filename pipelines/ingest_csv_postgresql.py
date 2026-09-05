@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 def main(csv_path: str, postgres: str, exists: bool) -> None:
     logging.basicConfig(level=logging.INFO)
-    print("Hello from ingest_potsgresql.py!")
+    print("Hello from ingest_csv_potsgresql.py!")
     with dbapi_conn(URI_POSTGRESQL, "postgresql") as conn:
         path = dbs.csv_path(csv_path)
         dbs.csv_to_postgresql(conn, path, postgres, exists)
