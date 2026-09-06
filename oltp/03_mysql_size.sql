@@ -1,0 +1,4 @@
+SELECT 
+    COUNT(*) AS NUM_OF_ROWS
+FROM
+    ITEMS_03
