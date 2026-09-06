@@ -36,7 +36,7 @@ with transactions (
 )    
 select 
     coalesce(senders.user_id, receivers.user_id) as user_id,
-    coalesce(senders.amount, 0) - coalesce(receivers.amount, 0) as net_changes
+    -1.0*(coalesce(senders.amount, 0) - coalesce(receivers.amount, 0)) as net_changes
 from
     senders
     full outer join receivers on senders.user_id = receivers.user_id
