@@ -23,10 +23,37 @@ def main(items: Path) -> None:
             memory_map=True,
         )
         print(eager)
-        
+        frequencies = (
+            eager.group_by(["DATES", "ITEM"])
+            .agg(pl.len().alias("FREQUENCY"))
+            .with_columns(
+                pl.col("FREQUENCY")
+                .rank(method="dense", descending=True)
+                .over("DATES")
+                .alias("POSITION")
+            )
+        )
+        print(frequencies)
+        result = frequencies.filter(pl.col("POSITION") == 1).select(
+            pl.col("ITEM").alias("TOP_ONE"), pl.col("DATES")
+        )
+        print(result)
+
         print("****LAZY MODE****")
-        lazy = pl.scan_ipc(source=items)
-        
+        lazy = (
+            pl.scan_ipc(source=items)
+            .group_by(["DATES", "ITEM"])
+            .agg(pl.len().alias("FREQUENCY"))
+            .with_columns(
+                pl.col("FREQUENCY")
+                .rank(method="dense", descending=True)
+                .over("DATES")
+                .alias("POSITION")
+            )
+            .filter(pl.col("POSITION") == 1)
+            .select(pl.col("ITEM").alias("TOP_ONE"), pl.col("DATES"))
+        ).collect()
+        print(lazy)
     else:
         raise PermissionError(f"Access denied {path}")
 
