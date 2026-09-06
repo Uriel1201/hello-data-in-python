@@ -1,13 +1,13 @@
 WITH POSITIONS (
     ID,
     ACTION_DATE,
-    POSITION 
+    POSITION
 ) AS (
-    SELECT 
+    SELECT
         ID,
         ACTION_DATE,
-        RANK() OVER(
-            PARTITION BY 
+        ROW_NUMBER() OVER(
+            PARTITION BY
                 ID
             ORDER BY ACTION_DATE DESC
         )
@@ -17,7 +17,7 @@ WITH POSITIONS (
     ID,
     ACTION_DATE
 ) AS (
-    SELECT 
+    SELECT
         POSITIONS.ID,
         POSITIONS.ACTION_DATE
     FROM
@@ -36,7 +36,9 @@ WITH POSITIONS (
     WHERE
         POSITION = 2
 )
-SELECT 
-    *
+SELECT
+    LAST.ID AS ID,
+    (LAST.ACTION_DATE - SECOND_LAST.ACTION_DATE) AS ELAPSED_TIME
 FROM
-    SECOND_LAST
+    LAST
+    LEFT JOIN SECOND_LAST ON LAST.ID = SECOND_LAST.ID
