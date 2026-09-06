@@ -10,12 +10,12 @@ items in the case of a tie. */
 /* ORACLE. */
 
 /********************************************************************/
-CREATE TABLE ITEMS_P3 (
+CREATE TABLE ITEMS_03 (
     DATES DATE,
     ITEM  VARCHAR(9)
 );
 
-INSERT INTO ITEMS_P3
+INSERT INTO ITEMS_03
     WITH NAMES AS (
         SELECT
             '01-jan-20',
