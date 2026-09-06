@@ -1,0 +1,5 @@
+FROM
+    '{table}'
+SELECT 
+    ID AS USER,
+    ACTION_DATE::DATE AS DATES
