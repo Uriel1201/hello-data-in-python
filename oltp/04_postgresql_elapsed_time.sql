@@ -5,7 +5,7 @@ with positions (
 ) as (
     select 
         "ID",
-        "ACTION_DATE",
+        "ACTION_DATE"::date,
         row_number() over(
             partition by
                 "ID"
@@ -13,14 +13,16 @@ with positions (
         )
     from
         "USERS_04"
+    where 
+        "ACTION_DATE" is not null
 ), last (
     user_id,
     dates
 ) as (
-    select 
+    select
         positions.user_id,
         positions.dates
-    feom
+    from
         positions 
     where
         positions.position = 1
@@ -28,7 +30,7 @@ with positions (
     user_id,
     dates
 ) as (
-    select 
+    select
         positions.user_id,
         positions.dates
     from
@@ -36,9 +38,9 @@ with positions (
     where
         positions.position = 2
 )
-select 
-    last_user_id,
+select
+    last.user_id,
     (last.dates - second_last.dates) as days_elapsed
-from 
+from
     last
-     SECOND_LAST ON LAST.ID = SECOND_LAST.ID
+    left outer join second_last on last.user_id = second_last.user_id
