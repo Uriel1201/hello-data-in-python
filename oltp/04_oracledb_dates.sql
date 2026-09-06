@@ -1,0 +1,5 @@
+SELECT
+    ID,
+    ACTION_DATE
+FROM
+    USERS_04
