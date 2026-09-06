@@ -1,0 +1,35 @@
+WITH POSITIONS AS (
+    FROM
+        '{table}'
+    SELECT
+        ID AS USER_ID,
+        ACTION_DATE::DATE AS DATES,
+        ROW_NUMBER() OVER(
+            PARTITION BY
+                ID
+            ORDER BY ACTION_DATE DESC
+        ) AS POSITION
+
+), LAST AS (
+    FROM
+        POSITIONS
+    SELECT
+        USER_ID,
+        DATES
+    WHERE
+        POSITION = 1
+), SECOND_LAST AS (
+    FROM
+        POSITIONS
+    SELECT
+        USER_ID,
+        DATES
+    WHERE
+        POSITION = 2
+)
+FROM
+    LAST
+    LEFT JOIN SECOND_LAST ON LAST.USER_ID = SECOND_LAST.USER_ID
+SELECT
+    LAST.USER_ID,
+    DATE_DIFF('DAY', SECOND_LAST.DATES, LAST.DATES) AS DAYS_ELAPSED
