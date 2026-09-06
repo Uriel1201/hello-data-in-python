@@ -11,7 +11,7 @@ import polars as pl
 
 
 def main(items: Path) -> None:
-    print("Hello from 02_polars.py!")
+    print("Hello from 03_polars.py!")
     if items.exists() and (items.stem == "03_items"):
         pl.Config.set_tbl_width_chars(60)
         print("****EAGER MODE****")
