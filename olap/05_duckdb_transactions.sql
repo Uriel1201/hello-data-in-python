@@ -1,0 +1,4 @@
+FROM
+    '{table}'
+SELECT 
+    *
