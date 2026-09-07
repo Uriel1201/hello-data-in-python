@@ -23,30 +23,55 @@ def main(dates: Path) -> None:
             memory_map=True,
         )
         print(eager)
-        positions = (
-            eager
-            .with_columns(
-                pl.int_range(pl.len()).over("ID", order_by="ACTION_DATE", descending=True).alias("POSITION") + 1
-            )
+        positions = eager.with_columns(
+            pl.int_range(pl.len())
+            .over("ID", order_by="ACTION_DATE", descending=True)
+            .alias("POSITION")
+            + 1
         )
         print(positions)
-        last = positions.filter(pl.col("POSITION") == 1).select(pl.col("ID"), pl.col("ACTION_DATE").alias("LAST_ACTION"))
+        last = positions.filter(pl.col("POSITION") == 1).select(
+            pl.col("ID"), pl.col("ACTION_DATE").alias("LAST_ACTION")
+        )
         print(last)
-        second_last = positions.filter(pl.col("POSITION") == 2).select(pl.col("ID"), pl.col("ACTION_DATE").alias("SECOND_LAST_ACTION"))
+        second_last = positions.filter(pl.col("POSITION") == 2).select(
+            pl.col("ID"), pl.col("ACTION_DATE").alias("SECOND_LAST_ACTION")
+        )
         print(second_last)
-        result= (last.join(second_last, on="ID", how = "left").with_columns((pl.col("LAST_ACTION") - pl.col("SECOND_LAST_ACTION")).dt.total_days().alias("DAYS_ELAPSED"))
-                     .select(pl.col("ID"), pl.col("DAYS_ELAPSED"))
-        )   
+        result = (
+            last.join(second_last, on="ID", how="left")
+            .with_columns(
+                (pl.col("LAST_ACTION") - pl.col("SECOND_LAST_ACTION"))
+                .dt.total_days()
+                .alias("DAYS_ELAPSED")
+            )
+            .select(pl.col("ID"), pl.col("DAYS_ELAPSED"))
+        )
         print(result)
 
         print("****LAZY MODE****")
-        lazy = (
-            pl.scan_ipc(source=dates).with_columns(
-                pl.int_range(pl.len()).over("ID", order_by="ACTION_DATE", descending=True).alias("POSITION") + 1
-            )
+        lazy = pl.scan_ipc(source=dates).with_columns(
+            pl.int_range(pl.len())
+            .over("ID", order_by="ACTION_DATE", descending=True)
+            .alias("POSITION")
+            + 1
         )
-        result = (lazy.filter(pl.col("POSITION") == 1).select(pl.col("ID"), pl.col("ACTION_DATE").alias("LAST_ACTION")).join(lazy.filter(pl.col("POSITION") == 2).select(pl.col("ID"), pl.col("ACTION_DATE").alias("SECOND_LAST_ACTION")), on="ID", how = "left").with_columns((pl.col("LAST_ACTION") - pl.col("SECOND_LAST_ACTION")).dt.total_days().alias("DAYS_ELAPSED"))
-                     .select(pl.col("ID"), pl.col("DAYS_ELAPSED"))
+        result = (
+            lazy.filter(pl.col("POSITION") == 1)
+            .select(pl.col("ID"), pl.col("ACTION_DATE").alias("LAST_ACTION"))
+            .join(
+                lazy.filter(pl.col("POSITION") == 2).select(
+                    pl.col("ID"), pl.col("ACTION_DATE").alias("SECOND_LAST_ACTION")
+                ),
+                on="ID",
+                how="left",
+            )
+            .with_columns(
+                (pl.col("LAST_ACTION") - pl.col("SECOND_LAST_ACTION"))
+                .dt.total_days()
+                .alias("DAYS_ELAPSED")
+            )
+            .select(pl.col("ID"), pl.col("DAYS_ELAPSED"))
         ).collect()
         print(result)
     else:
